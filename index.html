@@ -3,7 +3,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Калькулятор Зарплаты</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
       --blue: #2196F3;
@@ -46,19 +45,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 16px;
   font-size: 15px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
-.row-inline label {
+.row-inline .group {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 4px;
 }
 
 .row-inline input[type="number"] {
-  width: 64px;
+  width: 80px;
   padding: 6px;
   font-size: 16px;
   text-align: center;
@@ -83,7 +82,8 @@ input::placeholder {
 .toggle {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -191,16 +191,29 @@ input:checked + .slider:before {
   margin-top: 16px;
 }
 
+.divider {
+  width: 1px;
+  height: 40px;
+  background: #ccc;
+}
+
   </style>
 </head>
 <body>
   <div class="top-bar">1 МРП = 3932 ₸ | 1 МЗП = 85000 ₸</div>
   <div class="container">
-    <div class="center-icon">🌤</div><input type="number" id="tarif" placeholder="Часовой тариф" value="" />
+    <div class="center-icon">🌤</div><input type="number" id="tarif" placeholder="Часовой тариф" />
 
 <div class="row-inline">
-  <label>День (час): <input type="number" id="dayh" placeholder="0"></label>
-  <label>Ночь (час): <input type="number" id="nighth" placeholder="0"></label>
+  <div class="group">
+    <label for="dayh">День (час):</label>
+    <input type="number" id="dayh" placeholder="0">
+  </div>
+  <div class="divider"></div>
+  <div class="group">
+    <label for="nighth">Ночь (час):</label>
+    <input type="number" id="nighth" placeholder="0">
+  </div>
 </div>
 
 <div class="toggle">
@@ -244,7 +257,6 @@ input:checked + .slider:before {
   </div>  <script>
     const MRP = 3932;
     const MAX_OSMS = 17000;
-    const tg = window.Telegram.WebApp;
 
     function format(n) {
       return new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2 }).format(n) + ' ₸';
@@ -255,6 +267,11 @@ input:checked + .slider:before {
       const dayh = parseInt(document.getElementById('dayh').value) || 0;
       const nighth = parseInt(document.getElementById('nighth').value) || 0;
       const union = document.getElementById('union').checked;
+
+      localStorage.setItem('tarif', tarif);
+      localStorage.setItem('dayh', dayh);
+      localStorage.setItem('nighth', nighth);
+      localStorage.setItem('union', union);
 
       const daySum = dayh * tarif;
       const nightSum = nighth * (tarif / 2);
@@ -282,21 +299,36 @@ input:checked + .slider:before {
       document.getElementById('res_withheld').textContent = format(withheld);
 
       document.getElementById('res_naruki').textContent = format(naruki);
-
-      if (tg && tg.ready) {
-        tg.MainButton.setText('На руки: ' + format(naruki));
-        tg.MainButton.show();
-      }
     }
 
-    function resetForm() {
-      document.getElementById('tarif').value = '';
+    function resetValues(keepTarif = false) {
+      if (!keepTarif) document.getElementById('tarif').value = '';
       document.getElementById('dayh').value = '';
       document.getElementById('nighth').value = '';
-      document.getElementById('union').checked = false;
       document.querySelectorAll('span[id^="res_"]').forEach(span => span.textContent = '0,00 ₸');
     }
 
-    tg.ready();
+    function resetForm() {
+      document.getElementById('union').checked = false;
+      resetValues(false);
+      localStorage.clear();
+    }
+
+    document.getElementById('union').addEventListener('change', function () {
+      resetValues(true);
+    });
+
+    // Автозагрузка сохранённых данных
+    window.addEventListener('DOMContentLoaded', () => {
+      const tarif = localStorage.getItem('tarif');
+      const dayh = localStorage.getItem('dayh');
+      const nighth = localStorage.getItem('nighth');
+      const union = localStorage.getItem('union') === 'true';
+
+      if (tarif !== null) document.getElementById('tarif').value = tarif;
+      if (dayh !== null) document.getElementById('dayh').value = dayh;
+      if (nighth !== null) document.getElementById('nighth').value = nighth;
+      document.getElementById('union').checked = union;
+    });
   </script></body>
 </html>
