@@ -5,97 +5,179 @@
   <title>Калькулятор Зарплаты</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #fff;
-      color: #000;
-    }
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 18px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    label, input {
-      display: block;
-      width: 100%;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    input[type="number"] {
-      padding: 8px;
-    }
-    .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .row input {
-      width: 100%;
-    }
-    .result-block {
-      margin-top: 20px;
-      font-size: 16px;
-    }
-    .result-block div {
-      margin: 4px 0;
-    }
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      margin-top: 30px;
-      color: #555;
-    }
-    .hidden {
-      display: none;
-    }
+    :root {
+      --blue: #2196F3;
+      --red: #f44336;
+      --green: #4CAF50;
+      --gray: #888;
+    }* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  color: #000;
+}
+
+.top-bar {
+  background-color: var(--blue);
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.center-icon {
+  text-align: center;
+  font-size: 24px;
+  margin: 8px 0;
+}
+
+.row-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.row-inline input[type="number"] {
+  width: 64px;
+  padding: 4px;
+  font-size: 16px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 14px;
+  color: #333;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 15px;
+}
+
+.results, .withheld {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.results strong, .withheld strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.results div, .withheld div {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.final-total {
+  text-align: center;
+  font-size: 18px;
+  margin: 12px 0;
+  font-weight: bold;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-row button {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.reset { background-color: var(--red); }
+.calc  { background-color: var(--green); }
+
+.footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 16px;
+}
+
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Калькулятор Зарплаты</h1>
-    <label>Часовой тариф:</label>
-    <input type="number" id="tarif" value="3360"><div class="row">
-  <div>
-    <label>День (час):</label>
-    <input type="number" id="dayh" value="0">
-  </div>
-  <div>
-    <label>Ночь (час):</label>
-    <input type="number" id="nighth" value="0">
-  </div>
+  <div class="top-bar">1 МРП = 3932 ₸ | 1 МЗП = 85000 ₸</div>
+  <div class="container"><div class="center-icon">🌤</div>
+
+<label>Часовой тариф:</label>
+<input type="number" id="tarif" value="3360">
+
+<div class="row-inline">
+  <span>День (час):</span>
+  <input type="number" id="dayh" value="0">
+  <span>|</span>
+  <span>Ночь (час):</span>
+  <input type="number" id="nighth" value="0">
 </div>
 
-<div>
-  <label>
-    <input type="checkbox" id="union"> Профсоюз 1%
-  </label>
+<div class="toggle">
+  <input type="checkbox" id="union">
+  <label for="union">Профсоюз 1%</label>
 </div>
 
-<div class="result-block">
+<div class="results">
   <strong>Начислено:</strong>
-  <div>День: <span id="res_day">0,00 ₸</span></div>
-  <div>Ночь: <span id="res_night">0,00 ₸</span></div>
-  <div>33.3%: <span id="res_bonus">0,00 ₸</span></div>
-  <div><strong>Всего: <span id="res_total">0,00 ₸</span></strong></div>
+  <div><span>День:</span><span id="res_day">0,00 ₸</span></div>
+  <div><span>Ночь:</span><span id="res_night">0,00 ₸</span></div>
+  <div><span>33.3%:</span><span id="res_bonus">0,00 ₸</span></div>
+  <div><strong>Всего:</strong><strong id="res_total">0,00 ₸</strong></div>
 </div>
 
-<div class="result-block">
+<div class="withheld">
   <strong>Удержано:</strong>
-  <div>ИПН: <span id="res_ipn">0,00 ₸</span></div>
-  <div>ОПВ: <span id="res_opv">0,00 ₸</span></div>
-  <div>ОСМС: <span id="res_osms">0,00 ₸</span></div>
-  <div><strong>Всего: <span id="res_withheld">0,00 ₸</span></strong></div>
+  <div><span>ИПН:</span><span id="res_ipn">0,00 ₸</span></div>
+  <div><span>ОПВ:</span><span id="res_opv">0,00 ₸</span></div>
+  <div><span>ОСМС:</span><span id="res_osms">0,00 ₸</span></div>
+  <div><strong>Всего:</strong><strong id="res_withheld">0,00 ₸</strong></div>
 </div>
 
-<div class="result-block">
-  <strong>На руки: <span id="res_naruki">0,00 ₸</span></strong>
+<div class="final-total">На руки: <span id="res_naruki">0,00 ₸</span></div>
+
+<div class="button-row">
+  <button class="reset" onclick="resetForm()">СБРОСИТЬ</button>
+  <button class="calc" onclick="calculate()">РАССЧИТАТЬ</button>
 </div>
 
 <div class="footer">
@@ -122,8 +204,7 @@
       const daySum = dayh * tarif;
       const nightSum = nighth * (tarif / 2);
       const bonus = (daySum + nightSum) * 0.3333;
-      const vredn = 0;
-      const total = daySum + nightSum + bonus + vredn;
+      const total = daySum + nightSum + bonus;
       const opv = total * 0.1;
       let osms = total * 0.02;
       if (osms > MAX_OSMS) osms = MAX_OSMS;
@@ -149,6 +230,14 @@
         tg.MainButton.setText('На руки: ' + format(naruki));
         tg.MainButton.show();
       }
+    }
+
+    function resetForm() {
+      document.getElementById('tarif').value = 3360;
+      document.getElementById('dayh').value = 0;
+      document.getElementById('nighth').value = 0;
+      document.getElementById('union').checked = false;
+      calculate();
     }
 
     document.getElementById('tarif').addEventListener('input', calculate);
