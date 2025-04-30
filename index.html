@@ -260,7 +260,7 @@ input:checked + .slider:before {
     const MAX_OSMS = 17000;
 
     function format(n) {
-      return n.toFixed(2).replace('.', '.') + ' ₸';
+      return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸';
     }
 
     function calculate() {
@@ -308,7 +308,7 @@ input:checked + .slider:before {
         document.getElementById('nighth').value = '';
       }
       document.querySelectorAll('span[id^="res_"]').forEach(span => span.textContent = '0.00 ₸');
-      document.getElementById('union_line').style.display = 'none';
+      document.getElementById('union_line').style.display = document.getElementById('union').checked ? 'flex' : 'none';
     }
 
     function resetForm() {
