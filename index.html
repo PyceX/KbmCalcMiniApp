@@ -158,6 +158,13 @@ input:checked + .slider:before {
   padding: 2px 0;
 }
 
+.box .total-line {
+  font-weight: bold;
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
 .final-total {
   text-align: center;
   font-size: 18px;
@@ -230,7 +237,7 @@ input:checked + .slider:before {
     <div><span>День:</span><span id="res_day">0.00 ₸</span></div>
     <div><span>Ночь:</span><span id="res_night">0.00 ₸</span></div>
     <div><span>33.3%:</span><span id="res_bonus">0.00 ₸</span></div>
-    <div><strong>Всего:</strong><strong id="res_total">0.00 ₸</strong></div>
+    <div class="total-line"><span>Всего:</span><span id="res_total">0.00 ₸</span></div>
   </div>
   <div class="box">
     <strong>Удержано:</strong>
@@ -238,7 +245,7 @@ input:checked + .slider:before {
     <div><span>ОПВ:</span><span id="res_opv">0.00 ₸</span></div>
     <div><span>ОСМС:</span><span id="res_osms">0.00 ₸</span></div>
     <div id="union_line" style="display: none;"><span>Профсоюз:</span><span id="res_union">0.00 ₸</span></div>
-    <div><strong>Всего:</strong><strong id="res_withheld">0.00 ₸</strong></div>
+    <div class="total-line"><span>Всего:</span><span id="res_withheld">0.00 ₸</span></div>
   </div>
 </div>
 
@@ -307,7 +314,8 @@ input:checked + .slider:before {
         document.getElementById('dayh').value = '';
         document.getElementById('nighth').value = '';
       }
-      document.querySelectorAll('span[id^="res_"]').forEach(span => span.textContent = '0.00 ₸');
+      const ids = ['res_day','res_night','res_bonus','res_total','res_ipn','res_opv','res_osms','res_union','res_withheld','res_naruki'];
+      ids.forEach(id => document.getElementById(id).textContent = '0.00 ₸');
       document.getElementById('union_line').style.display = document.getElementById('union').checked ? 'flex' : 'none';
     }
 
