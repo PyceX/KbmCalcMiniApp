@@ -237,6 +237,7 @@ input:checked + .slider:before {
     <div><span>ИПН:</span><span id="res_ipn">0,00 ₸</span></div>
     <div><span>ОПВ:</span><span id="res_opv">0,00 ₸</span></div>
     <div><span>ОСМС:</span><span id="res_osms">0,00 ₸</span></div>
+    <div id="union_line" style="display: none;"><span>Профсоюз:</span><span id="res_union">0,00 ₸</span></div>
     <div><strong>Всего:</strong><strong id="res_withheld">0,00 ₸</strong></div>
   </div>
 </div>
@@ -297,28 +298,41 @@ input:checked + .slider:before {
       document.getElementById('res_opv').textContent = format(opv);
       document.getElementById('res_osms').textContent = format(osms);
       document.getElementById('res_withheld').textContent = format(withheld);
-
       document.getElementById('res_naruki').textContent = format(naruki);
+
+      const unionLine = document.getElementById('union_line');
+      const resUnion = document.getElementById('res_union');
+      if (union) {
+        unionLine.style.display = 'flex';
+        resUnion.textContent = format(profsouz);
+      } else {
+        unionLine.style.display = 'none';
+        resUnion.textContent = '0,00 ₸';
+      }
     }
 
-    function resetValues(keepTarif = false) {
+    function resetValues(keepTarif = false, keepHours = false) {
       if (!keepTarif) document.getElementById('tarif').value = '';
-      document.getElementById('dayh').value = '';
-      document.getElementById('nighth').value = '';
+      if (!keepHours) {
+        document.getElementById('dayh').value = '';
+        document.getElementById('nighth').value = '';
+      }
       document.querySelectorAll('span[id^="res_"]').forEach(span => span.textContent = '0,00 ₸');
+      document.getElementById('union_line').style.display = 'none';
     }
 
     function resetForm() {
       document.getElementById('union').checked = false;
-      resetValues(false);
-      localStorage.clear();
+      resetValues(true, false);
+      localStorage.removeItem('dayh');
+      localStorage.removeItem('nighth');
+      localStorage.removeItem('union');
     }
 
     document.getElementById('union').addEventListener('change', function () {
-      resetValues(true);
+      resetValues(true, true);
     });
 
-    // Автозагрузка сохранённых данных
     window.addEventListener('DOMContentLoaded', () => {
       const tarif = localStorage.getItem('tarif');
       const dayh = localStorage.getItem('dayh');
