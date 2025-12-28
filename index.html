@@ -289,13 +289,13 @@
     </div>
 
     <div class="footer">
-      Версия: 1.2 (No Close)<br>
+      Версия: 1.0<br>
       t.me/id362<br>
       @kbm_calc_bot
     </div>
   </div>
 
-  <div id="notification">Отправлено админу!</div>
+  /* <div id="notification">Отправлено админу!</div> */
 
   <script>
     // ================= НАСТРОЙКИ =================
@@ -331,7 +331,7 @@
 👤 <b>От:</b> ${username} (ID: ${userId})
 
 💵 <b>Тариф:</b> ${data.tarif} ₸
-⏰ <b>Часы:</b> ${data.hours}
+⏰ <b>Часы:</b> ${data.hoursd}/${data.hoursn}
 💰 <b>На руки:</b> ${data.total} ₸
         `;
 
@@ -349,10 +349,10 @@
                     parse_mode: 'HTML'
                 })
             });
-            #showNotification("✅ Отправлено администратору");
+            //showNotification("✅ Отправлено администратору");
         } catch (error) {
             console.error("Ошибка отправки:", error);
-            #showNotification("❌ Ошибка отправки");
+            //showNotification("❌ Ошибка отправки");
         }
     }
 
@@ -406,7 +406,8 @@
           sendToAdmin({
               tarif: tarif,
               total: naruki.toFixed(2),
-              hours: dayh + nighth
+              hoursd: dayh,
+              hoursn: nighth
           });
       }
     }
