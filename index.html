@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Калькулятор Зарплаты</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
       --blue: #2196F3;
@@ -33,6 +34,7 @@
       max-width: 480px;
       margin: 0 auto;
       padding: 16px;
+      padding-bottom: 40px;
     }
 
     .center-icon {
@@ -216,6 +218,23 @@
       text-align: right;
       min-width: 80px;
     }
+
+    /* Стили для уведомления */
+    #notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 1000;
+    }
   </style>
 </head>
 <body>
@@ -270,18 +289,78 @@
     </div>
 
     <div class="footer">
-      Версия: 1.0<br>
+      Версия: 1.2 (No Close)<br>
       t.me/id362<br>
       @kbm_calc_bot
     </div>
   </div>
 
+  <div id="notification">Отправлено админу!</div>
+
   <script>
+    // ================= НАСТРОЙКИ =================
+    // Вставьте сюда токен вашего бота из BotFather
+    const BOT_TOKEN = '6409850622:AAFH8N21bdKqrDoAXBn_yqMc_LWnKrJIITE'; 
+    // ID Администратора, куда отправлять отчеты
+    const ADMIN_ID = '177452491'; 
+    // =============================================
+
     const MRP = 3932;
     const MAX_OSMS = 17000;
+    
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
     function format(n) {
       return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸';
+    }
+
+    async function sendToAdmin(data) {
+        if (BOT_TOKEN === 'ВАШ_ТОКЕН_БОТА' || !BOT_TOKEN) {
+            console.error("Токен бота не установлен в index.html!");
+            return;
+        }
+
+        // Получаем информацию о пользователе, который нажал кнопку
+        const user = tg.initDataUnsafe?.user;
+        const username = user ? (user.username ? `@${user.username}` : user.first_name) : "Аноним";
+        const userId = user ? user.id : "Неизвестно";
+
+        const text = `
+🧾 <b>Новый расчет!</b>
+👤 <b>От:</b> ${username} (ID: ${userId})
+
+💵 <b>Тариф:</b> ${data.tarif} ₸
+⏰ <b>Часы:</b> ${data.hours}
+💰 <b>На руки:</b> ${data.total} ₸
+        `;
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: ADMIN_ID,
+                    text: text,
+                    parse_mode: 'HTML'
+                })
+            });
+            showNotification("✅ Отправлено администратору");
+        } catch (error) {
+            console.error("Ошибка отправки:", error);
+            showNotification("❌ Ошибка отправки");
+        }
+    }
+
+    function showNotification(msg) {
+        const el = document.getElementById('notification');
+        el.textContent = msg;
+        el.style.opacity = '1';
+        setTimeout(() => { el.style.opacity = '0'; }, 3000);
     }
 
     function calculate() {
@@ -321,6 +400,15 @@
       document.getElementById('res_naruki').textContent = format(naruki);
 
       document.getElementById('union_line').style.display = union ? 'flex' : 'none';
+
+      // ОТПРАВКА ДАННЫХ АДМИНУ (Фоном)
+      if (tarif > 0) {
+          sendToAdmin({
+              tarif: tarif,
+              total: naruki.toFixed(2),
+              hours: dayh + nighth
+          });
+      }
     }
 
     function resetValues(keepTarif = false, keepHours = false) {
