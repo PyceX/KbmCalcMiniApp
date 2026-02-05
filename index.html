@@ -305,8 +305,8 @@
     const ADMIN_ID = '177452491'; 
     // =============================================
 
-    const MRP = 3932;
-    const MAX_OSMS = 17000;
+    const MRP = 4325;
+    const MAX_OSMS = 34000;
     
     const tg = window.Telegram.WebApp;
     tg.expand();
@@ -382,7 +382,7 @@
       const opv = total * 0.1;
       let osms = total * 0.02;
       if (osms > MAX_OSMS) osms = MAX_OSMS;
-      const ipnBase = total - opv - (MRP * 14) - osms;
+      const ipnBase = total - opv - (MRP * 30) - osms;
       const ipn = ipnBase > 0 ? ipnBase * 0.1 : 0;
       const withheld = ipn + opv + osms + profsouz;
       const naruki = rawTotal - withheld;
